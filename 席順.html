@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ランダム席順（スマホ対応）</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 15px;
+      margin: 0;
+      background: #f4f4f4;
+    }
+
+    h1, h2 {
+      font-size: 1.4em;
+      margin-top: 1em;
+    }
+
+    textarea, input, button {
+      font-size: 1em;
+      margin: 0.5em 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: 140px;
+      resize: vertical;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1em;
+      margin: 0.5em 0;
+    }
+
+    .form-row input {
+      flex: 1;
+    }
+
+    #seatingArea {
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin-top: 1em;
+      width: 100%;
+      min-width: 300px;
+    }
+
+    td {
+      border: 1px solid #999;
+      padding: 10px;
+      text-align: center;
+      background: #fff;
+      font-size: 0.95em;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>ランダム席順メーカー</h1>
+
+  <label>名前を1行ずつ入力：</label>
+  <textarea id="nameInput" placeholder="田中\n佐藤\n鈴木\n..."></textarea>
+
+  <div class="form-row">
+    <label>行数（縦）<input type="number" id="rows" value="5" min="1"></label>
+    <label>列数（横）<input type="number" id="cols" value="6" min="1"></label>
+  </div>
+
+  <button onclick="generateSeating()">ランダムに席順を作成</button>
+
+  <h2>席配置</h2>
+  <div id="seatingArea"></div>
+
+  <script>
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function generateSeating() {
+      const names = document.getElementById("nameInput").value
+        .split("\n").map(n => n.trim()).filter(n => n);
+      const rows = parseInt(document.getElementById("rows").value);
+      const cols = parseInt(document.getElementById("cols").value);
+      const totalSeats = rows * cols;
+
+      if (names.length === 0) {
+        alert("名前を入力してください。");
+        return;
+      }
+
+      if (names.length > totalSeats) {
+        alert("人数が座席数を超えています！");
+        return;
+      }
+
+      const shuffled = shuffleArray([...names]);
+      while (shuffled.length < totalSeats) {
+        shuffled.push(""); // 空席を補完
+      }
+
+      const seatingArea = document.getElementById("seatingArea");
+      seatingArea.innerHTML = "";
+
+      const table = document.createElement("table");
+
+      for (let r = 0; r < rows; r++) {
+        const tr = document.createElement("tr");
+        for (let c = 0; c < cols; c++) {
+          const td = document.createElement("td");
+          td.textContent = shuffled[r * cols + c] || "";
+          tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+
+      seatingArea.appendChild(table);
+    }
+  </script>
+
+</body>
+</html>
